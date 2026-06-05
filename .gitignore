@@ -1,0 +1,13 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Mac system files
+.DS_Store
+
+# Data files (too large for GitHub)
+data/raw/*.csv

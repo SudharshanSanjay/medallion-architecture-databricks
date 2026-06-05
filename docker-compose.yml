@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: kali_postgres
+    environment:
+      POSTGRES_DB: kali_source
+      POSTGRES_USER: kali_user
+      POSTGRES_PASSWORD: kali_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+
+volumes:
+  pgdata:
