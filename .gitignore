@@ -1,6 +1,5 @@
 # Virtual environment
 .venv/
-venv/
 
 # Python cache
 __pycache__/
@@ -12,4 +11,3 @@ __pycache__/
 
 # Data files (too large for GitHub)
 data/raw/*.csv
-.venv/
