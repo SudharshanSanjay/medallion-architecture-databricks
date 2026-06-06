@@ -11,3 +11,6 @@ __pycache__/
 
 # Data files (too large for GitHub)
 data/raw/*.csv
+
+#Ignore Lake house
+lakehouse/
