@@ -1,4 +1,5 @@
 """
+
 run_local.py — one-command local Bronze → Silver → Gold pipeline runner.
 
 Usage:
@@ -20,6 +21,7 @@ import medallion.config as cfg
 from medallion.bronze import ingest_csv, write_bronze
 from medallion.silver import build_silver
 from medallion import gold as g
+from medallion.forecast import run_forecast
 
 # ── Suppress noisy Spark/Hadoop INFO logs ─────────────────────────
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -107,8 +109,19 @@ def run_gold(spark: SparkSession, df_silver) -> dict:
 
     return counts
 
+def run_forecast_layer(spark: SparkSession) -> dict:
+    """Run Prophet forecasting on Gold monthly trend."""
+    metrics = run_forecast(
+        spark=spark,
+        monthly_trend_path=f"{cfg.LOCAL_GOLD}/monthly_trend",
+        forecast_output_path=f"{cfg.LOCAL_GOLD}/revenue_forecast",
+        chart_output_path="docs/images/revenue_forecast.png",
+        horizon_months=6,
+        holdout_months=2,
+    )
+    return metrics
 
-def print_audit(bronze_count, silver_count, gold_counts):
+def print_audit(bronze_count, silver_count, gold_counts, forecast_metrics=None):
     """Print final medallion audit summary."""
     print("\n" + "=" * 52)
     print("  MEDALLION PIPELINE — LOCAL RUN COMPLETE")
@@ -119,8 +132,14 @@ def print_audit(bronze_count, silver_count, gold_counts):
     print()
     for name, count in gold_counts.items():
         print(f"  Gold {name:<22}: {count} rows")
+    if forecast_metrics:
+        print()
+        print(f"  Forecast MAE      : ₹{forecast_metrics['mae']:,.2f}")
+        print(f"  Forecast MAPE     : {forecast_metrics['mape_pct']:.1f}%")
     print()
     print(f"  Delta tables written to: ./lakehouse/")
+    print(f"  MLflow runs at        : ./mlruns/")
+    print(f"  Forecast chart at     : docs/images/revenue_forecast.png")
     print("=" * 52)
 
 
@@ -136,7 +155,8 @@ def main():
         df_csv,    bronze_count = run_bronze(spark)
         df_silver, silver_count = run_silver(spark, df_csv)
         gold_counts             = run_gold(spark, df_silver)
-        print_audit(bronze_count, silver_count, gold_counts)
+        forecast_metrics = run_forecast_layer(spark)
+        print_audit(bronze_count, silver_count, gold_counts,forecast_metrics)
     finally:
         spark.stop()
         print("\nSpark session stopped.")
