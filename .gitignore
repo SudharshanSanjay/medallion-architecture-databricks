@@ -21,3 +21,4 @@ docs/images/
 #Ignore Local ML Runs
 mlruns/
 mlflow.db
+.env
