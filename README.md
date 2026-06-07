@@ -117,6 +117,9 @@ in the dataset.
 ---
 
 ## Project structure
+## Project structure
+
+```
 medallion-architecture-databricks/
 ├── notebooks/                  # Databricks notebooks (cloud path)
 │   ├── 00_setup.py
@@ -147,6 +150,7 @@ medallion-architecture-databricks/
 ├── docker-compose.yml          # PostgreSQL container
 ├── requirements.txt            # Pinned dependencies
 └── run_local.py                # One-command local pipeline runner
+```
 
 ---
 
